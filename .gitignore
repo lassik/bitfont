@@ -1,1 +1,6 @@
+*.dSYM
 .DS_Store
+/calc
+/dumbfont2asm
+/dumbfont2image
+/ttf2dumbfont

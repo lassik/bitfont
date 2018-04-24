@@ -44,7 +44,7 @@ static void hexlines(size_t chr, const char *lineprefix,
   }
 }
 
-static void out_gnu(void) {
+static void out_as(void) {
   size_t chr;
 
   printf(".globl %s\n", fontlabel);
@@ -77,7 +77,7 @@ static void out_nasm(void) {
 static void (*out)(void);
 
 static void usage(void) {
-  fprintf(stderr, "usage: dumbfont2include gnu|nasm <fontlabel> [<endlabel>]\n");
+  fprintf(stderr, "usage: dumbfont2include as|nasm <fontlabel> [<endlabel>]\n");
   exit(1);
 }
 
@@ -94,8 +94,8 @@ int main(int argc, char **argv) {
   } else {
     usage();
   }
-  if (!strcmp(syntax, "gnu")) {
-    out = out_gnu;
+  if (!strcmp(syntax, "as")) {
+    out = out_as;
   } else if (!strcmp(syntax, "nasm")) {
     out = out_nasm;
   } else {

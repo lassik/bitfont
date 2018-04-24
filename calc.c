@@ -11,6 +11,14 @@ static void pages_sectors(unsigned int bytes_per_image, unsigned int images) {
   printf("%u images fit in %u pages (or %u sectors)\n", images, pages, sectors);
 }
 
+static void reso(unsigned int pixels, unsigned int screenwidth,
+                 unsigned int screenheight) {
+  printf("%ux%s%u%s characters fit on a %ux%u pixel screen\n",
+         screenwidth / pixels, ((screenwidth % pixels) ? "*" : ""),
+         screenheight / pixels, ((screenheight % pixels) ? "+" : ""),
+         screenwidth, screenheight);
+}
+
 static void calc(unsigned int pixels) {
   if (pixels % 8) {
     exit(1);
@@ -26,6 +34,12 @@ static void calc(unsigned int pixels) {
   printf("%u rows fit in 64 bits\n", 8 / bytes_per_row);
   pages_sectors(bytes_per_image, 128);
   pages_sectors(bytes_per_image, 256);
+  reso(pixels, 640, 480);
+  reso(pixels, 800, 600);
+  reso(pixels, 1024, 768);
+  reso(pixels, 1280, 720);
+  reso(pixels, 1280, 768);
+  reso(pixels, 1920, 1080);
 }
 
 int main(void) {

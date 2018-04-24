@@ -71,6 +71,20 @@ static void out_c(void) {
   printf("\n};\n");
 }
 
+static void out_go(void) {
+  size_t chr;
+
+  if (endlabel) {
+    die("go doesn't support an endlabel");
+  }
+  printf("package main\n\n");
+  printf("const %s = \n", fontlabel);
+  for (chr = 0; chr < nchr; chr++) {
+    hexlines(chr, "\t\"\\x", "\\x", "\"+");
+  }
+  printf("\t\"\"\n");
+}
+
 static void out_nasm(void) {
   size_t chr;
 
@@ -89,7 +103,8 @@ static void out_nasm(void) {
 static void (*out)(void);
 
 static void usage(void) {
-  fprintf(stderr, "usage: dumbfont2include as|c|nasm <fontlabel> [<endlabel>]\n");
+  fprintf(stderr,
+          "usage: dumbfont2include as|c|go|nasm <fontlabel> [<endlabel>]\n");
   exit(1);
 }
 
@@ -110,6 +125,8 @@ int main(int argc, char **argv) {
     out = out_as;
   } else if (!strcmp(syntax, "c")) {
     out = out_c;
+  } else if (!strcmp(syntax, "go")) {
+    out = out_go;
   } else if (!strcmp(syntax, "nasm")) {
     out = out_nasm;
   } else {

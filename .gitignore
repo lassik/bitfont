@@ -1,6 +1,9 @@
 *.dSYM
 .DS_Store
 /calc
+/conversions/*.zip
+/conversions/dot_monoco
+/conversions/work
 /dumbfont2asm
 /dumbfont2image
 /ttf2dumbfont

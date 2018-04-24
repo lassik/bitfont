@@ -31,8 +31,7 @@ static void die(const char *msg) {
 }
 
 static void usage(void) {
-  fprintf(stderr, "usage: %s %s\n", PROGNAME,
-          "<ttf-file> 8|16|32|64 <baseline>");
+  fprintf(stderr, "usage: %s %s\n", PROGNAME, "<ttf-file> 8|16|32|64");
   exit(1);
 }
 
@@ -49,7 +48,7 @@ int main(int argc, char **argv) {
   unsigned int ibyte, ibit;
   int bestbaseline, leastmissing;
 
-  if (argc != 4) {
+  if (argc != 3) {
     usage();
   }
   ttf_file = argv[1];
@@ -69,12 +68,6 @@ int main(int argc, char **argv) {
   default:
     usage();
   }
-#if 0
-  baseline = atoi(argv[3]);
-  if ((baseline < 0) || (baseline >= side)) {
-      usage();
-  }
-#endif
   imagebytesize = side * side / 8;
   if (FT_Init_FreeType(&library)) {
     die("FT_Init_FreeType");

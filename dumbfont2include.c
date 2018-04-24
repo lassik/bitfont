@@ -77,7 +77,7 @@ static void out_nasm(void) {
 static void (*out)(void);
 
 static void usage(void) {
-  fprintf(stderr, "usage: dumbfont2asm gnu|nasm <fontlabel> [<endlabel>]\n");
+  fprintf(stderr, "usage: dumbfont2include gnu|nasm <fontlabel> [<endlabel>]\n");
   exit(1);
 }
 

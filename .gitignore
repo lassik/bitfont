@@ -4,6 +4,6 @@
 /conversions/*.zip
 /conversions/dot_monoco
 /conversions/work
-/dumbfont2asm
 /dumbfont2image
+/dumbfont2include
 /ttf2dumbfont

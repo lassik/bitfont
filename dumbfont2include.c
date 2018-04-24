@@ -10,8 +10,8 @@ static const size_t nchr = 128;
 static const char *fontlabel;
 static const char *endlabel;
 
-static void die(void) {
-  fprintf(stderr, "fail\n");
+static void die(const char *msg) {
+  fprintf(stderr, "%s\n", msg);
   exit(1);
 }
 
@@ -19,28 +19,26 @@ static void read_unisig(void) {
   unsigned char buf[sizeof(unisig)];
 
   if (1 != fread(buf, sizeof(unisig), 1, stdin)) {
-    die();
+    die("cannot read signature");
   }
   if (memcmp(buf, unisig, sizeof(unisig))) {
-    die();
+    die("bad signature");
   }
 }
 
-static void hexlines(size_t chr, const char *lineprefix,
-                     const char *hexprefix) {
+static void hexlines(size_t chr, const char *before, const char *between,
+                     const char *after) {
   size_t ln, col;
 
   for (ln = 0; ln < 4; ln++) {
-    printf("%s ", lineprefix);
+    printf("%s", before);
     for (col = 0; col < 8; col++) {
-      printf("%s%02x", hexprefix,
-             (unsigned int)bytes[(32 * chr) + (8 * ln) + col]);
-      if (col < 7) {
-        printf(",");
-      } else {
-        printf("\n");
+      if (col) {
+        printf("%s", between);
       }
+      printf("%02x", (unsigned int)bytes[(32 * chr) + (8 * ln) + col]);
     }
+    printf("%s\n", after);
   }
 }
 
@@ -52,11 +50,25 @@ static void out_as(void) {
   printf("%s:\n", fontlabel);
   for (chr = 0; chr < nchr; chr++) {
     printf(";\n");
-    hexlines(chr, ".byte", "0x");
+    hexlines(chr, ".byte 0x", ",0x", "");
   }
   if (endlabel) {
     printf("%s:\n", endlabel);
   }
+}
+
+static void out_c(void) {
+  size_t chr;
+
+  if (endlabel) {
+    die("c doesn't support an endlabel");
+  }
+  printf("unsigned char %s[%zu] = {\n", fontlabel, 32 * nchr);
+  for (chr = 0; chr < nchr; chr++) {
+    printf("\n");
+    hexlines(chr, "0x", ",0x", ",");
+  }
+  printf("\n};\n");
 }
 
 static void out_nasm(void) {
@@ -67,7 +79,7 @@ static void out_nasm(void) {
   printf("%s:\n", fontlabel);
   for (chr = 0; chr < nchr; chr++) {
     printf(";\n");
-    hexlines(chr, "db", "0x");
+    hexlines(chr, "db 0x", ",0x", "");
   }
   if (endlabel) {
     printf("%s:\n", endlabel);
@@ -77,7 +89,7 @@ static void out_nasm(void) {
 static void (*out)(void);
 
 static void usage(void) {
-  fprintf(stderr, "usage: dumbfont2include as|nasm <fontlabel> [<endlabel>]\n");
+  fprintf(stderr, "usage: dumbfont2include as|c|nasm <fontlabel> [<endlabel>]\n");
   exit(1);
 }
 
@@ -96,6 +108,8 @@ int main(int argc, char **argv) {
   }
   if (!strcmp(syntax, "as")) {
     out = out_as;
+  } else if (!strcmp(syntax, "c")) {
+    out = out_c;
   } else if (!strcmp(syntax, "nasm")) {
     out = out_nasm;
   } else {
@@ -103,7 +117,7 @@ int main(int argc, char **argv) {
   }
   read_unisig();
   if (1 != fread(bytes, sizeof(bytes), 1, stdin)) {
-    die();
+    die("cannot read from glyphs");
   }
   out();
   return 0;

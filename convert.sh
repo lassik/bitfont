@@ -15,6 +15,6 @@ identify fonts/dot-monoco/dot-monoco.tga
 cd 'fonts/ultimate-oldschool-pc-font-pack/Px437 (TrueType - DOS charset)'
 for font in *.ttf; do
 	font="${font%.*}"
-	../../../ttf2dumbfont "$font.ttf" >"$font.dumbfont"
+	../../../ttf2dumbfont "$font.ttf" 16 4 >"$font.dumbfont"
 	../../../dumbfont2image tga <"$font.dumbfont" >"$font.tga"
 done

@@ -148,3 +148,12 @@ dumbfont file with a general-purpose compressor such as Gzip, LZ4 or
 Snappy with excellent results. If there are gaps in the character
 range, those blank character glyphs are particularly easy for such
 algorithms to compress (since they are just long runs of zeros).
+
+Alternatives
+------------
+
+If dumbfont is *too* simple for your needs, the [PF2 bitmap font file
+format - a new font format for
+GRUB](http://grub.gibibit.com/New_font_format) is also reasonably
+simple while supporting more font sizes, kerning, and a little
+metadata.

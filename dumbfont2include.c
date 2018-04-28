@@ -10,26 +10,6 @@ static const char *fontlabel;
 static const char *endlabel;
 
 static void
-die(const char *msg)
-{
-    fprintf(stderr, "%s\n", msg);
-    exit(1);
-}
-
-static void
-read_unisig(void)
-{
-    unsigned char buf[sizeof(unisig16)];
-
-    if (1 != fread(buf, sizeof(unisig16), 1, stdin)) {
-        die("cannot read signature");
-    }
-    if (memcmp(buf, unisig16, sizeof(unisig16))) {
-        die("bad signature");
-    }
-}
-
-static void
 hexlines(size_t chr, const char *before, const char *between, const char *after)
 {
     size_t ln, col;
@@ -148,7 +128,9 @@ main(int argc, char **argv)
     } else {
         usage();
     }
-    read_unisig();
+    if (read_unisig() != 16) {
+        die("only dumbfont16 supported");
+    }
     if (1 != fread(bytes, sizeof(bytes), 1, stdin)) {
         die("cannot read from glyphs");
     }

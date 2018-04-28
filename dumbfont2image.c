@@ -16,26 +16,6 @@ static size_t width;
 static size_t height;
 
 static void
-die(const char *msg)
-{
-    fprintf(stderr, "%s\n", msg);
-    exit(1);
-}
-
-static void
-read_unisig(void)
-{
-    unsigned char buf[sizeof(unisig16)];
-
-    if (1 != fread(buf, sizeof(unisig16), 1, stdin)) {
-        die("cannot read unisig");
-    }
-    if (memcmp(buf, unisig16, sizeof(unisig16))) {
-        die("bad unisig");
-    }
-}
-
-static void
 read_character_images(void)
 {
     uint16_t rows[16];
@@ -162,7 +142,9 @@ main(int argc, char **argv)
     } else {
         usage();
     }
-    read_unisig();
+    if (read_unisig() != 16) {
+        die("only dumbfont16 supported");
+    }
     read_character_images();
     out();
     if ((1 != fwrite(header, headersize, 1, stdout)) ||

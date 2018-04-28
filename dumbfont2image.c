@@ -16,12 +16,16 @@ static unsigned char *ob;
 static size_t width;
 static size_t height;
 
-static void die(const char *msg) {
+static void
+die(const char *msg)
+{
   fprintf(stderr, "%s\n", msg);
   exit(1);
 }
 
-static void read_unisig(void) {
+static void
+read_unisig(void)
+{
   unsigned char buf[sizeof(unisig)];
 
   if (1 != fread(buf, sizeof(unisig), 1, stdin)) {
@@ -32,7 +36,9 @@ static void read_unisig(void) {
   }
 }
 
-static void read_character_images(void) {
+static void
+read_character_images(void)
+{
   uint16_t rows[16];
   size_t nr;
 
@@ -59,7 +65,9 @@ static void read_character_images(void) {
   height = 16;
 }
 
-static void out_farbfeld(void) {
+static void
+out_farbfeld(void)
+{
   unsigned char *src;
   uint16_t *dst;
   size_t codepoint, y, x;
@@ -93,7 +101,9 @@ static void out_farbfeld(void) {
   }
 }
 
-static void out_tga(void) {
+static void
+out_tga(void)
+{
   unsigned char *src;
   unsigned char *dst;
   size_t codepoint, y, x;
@@ -130,12 +140,16 @@ static void out_tga(void) {
 
 static void (*out)(void);
 
-static void usage(void) {
+static void
+usage(void)
+{
   fprintf(stderr, "usage: dumbfont2image farbfeld|tga\n");
   exit(1);
 }
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv)
+{
   const char *format;
 
   if (argc != 2) {

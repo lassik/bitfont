@@ -25,17 +25,23 @@ static const unsigned char unisig64[UNISIGSIZE] =
 
 static unsigned char pixels[NCODEPOINT * MAXIMAGEBYTESIZE];
 
-static void die(const char *msg) {
+static void
+die(const char *msg)
+{
   fprintf(stderr, "%s: %s\n", PROGNAME, msg);
   exit(1);
 }
 
-static void usage(void) {
+static void
+usage(void)
+{
   fprintf(stderr, "usage: %s %s\n", PROGNAME, "<ttf-file> 8|16|32|64");
   exit(1);
 }
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv)
+{
   static unsigned char imagebytes[MAXIMAGEBYTESIZE];
   const char *ttf_file;
   const unsigned char *unisig;
@@ -93,7 +99,8 @@ int main(int argc, char **argv) {
           if (bitmap->buffer[yphys * bitmap->pitch + xphys]) {
             x = xphys + (int)glyph->bitmap_left;
             y = yphys + side - baseline - (int)glyph->bitmap_top;
-            if (!((x >= 0) && (x < side) && (y >= 0) && (y < side))) {
+                        if (!((x >= 0) && (x < side) && (y >= 0) &&
+                                (y < side))) {
               missingpixels++;
             }
           }

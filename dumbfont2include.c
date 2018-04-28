@@ -10,12 +10,16 @@ static const size_t nchr = 128;
 static const char *fontlabel;
 static const char *endlabel;
 
-static void die(const char *msg) {
+static void
+die(const char *msg)
+{
   fprintf(stderr, "%s\n", msg);
   exit(1);
 }
 
-static void read_unisig(void) {
+static void
+read_unisig(void)
+{
   unsigned char buf[sizeof(unisig)];
 
   if (1 != fread(buf, sizeof(unisig), 1, stdin)) {
@@ -26,8 +30,9 @@ static void read_unisig(void) {
   }
 }
 
-static void hexlines(size_t chr, const char *before, const char *between,
-                     const char *after) {
+static void
+hexlines(size_t chr, const char *before, const char *between, const char *after)
+{
   size_t ln, col;
 
   for (ln = 0; ln < 4; ln++) {
@@ -42,7 +47,9 @@ static void hexlines(size_t chr, const char *before, const char *between,
   }
 }
 
-static void out_as(void) {
+static void
+out_as(void)
+{
   size_t chr;
 
   printf(".globl %s\n", fontlabel);
@@ -57,7 +64,9 @@ static void out_as(void) {
   }
 }
 
-static void out_c(void) {
+static void
+out_c(void)
+{
   size_t chr;
 
   if (endlabel) {
@@ -71,7 +80,9 @@ static void out_c(void) {
   printf("\n};\n");
 }
 
-static void out_go(void) {
+static void
+out_go(void)
+{
   size_t chr;
 
   if (endlabel) {
@@ -85,7 +96,9 @@ static void out_go(void) {
   printf("\t\"\"\n");
 }
 
-static void out_nasm(void) {
+static void
+out_nasm(void)
+{
   size_t chr;
 
   printf("global %s\n", fontlabel);
@@ -102,14 +115,19 @@ static void out_nasm(void) {
 
 static void (*out)(void);
 
-static void usage(void) {
+static void
+usage(void)
+{
   fprintf(stderr,
           "usage: dumbfont2include as|c|go|nasm <fontlabel> [<endlabel>]\n");
   exit(1);
 }
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv)
+{
   const char *syntax;
+    void (*out)(void);
 
   if (argc == 3) {
     syntax = argv[1];

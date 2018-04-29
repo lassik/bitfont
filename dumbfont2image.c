@@ -65,9 +65,11 @@ copy_pixels(size_t bytes_per_pixel, size_t invert_rows)
     src = pixels;
     for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
         for (y = 0; y < 16; y++) {
-            yy = 16 * (codepoint / codepoints_per_row);
-            yy += invert_rows ? (16 - 1 - y) : y;
+            yy = 16 * (codepoint / codepoints_per_row) + y;
             xx = 16 * (codepoint % codepoints_per_row);
+            if (invert_rows) {
+                yy = height - 1 - yy;
+            }
             dst = ob + bytes_per_pixel * (16 * yy * codepoints_per_row + xx);
             rowbits = *src++;
             rowbits |= *src++ << 8;

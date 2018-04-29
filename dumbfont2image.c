@@ -96,8 +96,8 @@ u32l(unsigned char *out, unsigned long val)
 static void
 out_bmp(void)
 {
-    headersize = 0x36;
     obsize = ncodepoint * 16 * 16 * 3;
+    headersize = 0x36;
     header[0] = 'B';
     header[1] = 'M';
     u32l(&header[2], headersize + obsize);
@@ -114,19 +114,20 @@ out_bmp(void)
 static void
 out_farbfeld(void)
 {
+    obsize = ncodepoint * 16 * 16 * 8;
     headersize = 16;
     memcpy(header, "farbfeld", 8);
     header[10] = width >> 8;
     header[11] = width;
     header[14] = height >> 8;
     header[15] = height;
-    obsize = ncodepoint * 16 * 16 * 8;
     copy_pixels(8);
 }
 
 static void
 out_tga(void)
 {
+    obsize = ncodepoint * 16 * 16 * 3;
     headersize = 18;
     header[2] = 2;
     header[12] = width;
@@ -135,7 +136,6 @@ out_tga(void)
     header[15] = height >> 8;
     header[16] = 24;
     header[17] = 32;
-    obsize = ncodepoint * 16 * 16 * 3;
     copy_pixels(3);
 }
 

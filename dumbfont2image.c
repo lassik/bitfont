@@ -9,7 +9,7 @@ static size_t pixelscap;
 static unsigned char *pixels;
 static size_t ncodepoint;
 static size_t headersize;
-static unsigned char header[18];
+static unsigned char header[0x36];
 static size_t obsize;
 static unsigned char *ob;
 static size_t width;
@@ -42,6 +42,59 @@ read_character_images(void)
     }
     width = 16 * ncodepoint;
     height = 16;
+}
+
+static void
+u32l(unsigned char *out, unsigned long val)
+{
+    out[0] = val;
+    val >>= 8;
+    out[1] = val;
+    val >>= 8;
+    out[2] = val;
+    val >>= 8;
+    out[3] = val;
+}
+
+static void
+out_bmp(void)
+{
+    unsigned char *src;
+    unsigned char *dst;
+    size_t codepoint, y;
+
+    headersize = 0x36;
+    obsize = ncodepoint * 16 * 16 * 3;
+    if (!(ob = malloc(obsize))) {
+        die("out of memory");
+    }
+    header[0] = 'B';
+    header[1] = 'M';
+    u32l(&header[2], headersize + obsize);
+    u32l(&header[0xa], headersize);
+    u32l(&header[0xe], headersize - 0xe);
+    u32l(&header[0x12], width);
+    u32l(&header[0x16], height);
+    header[0x1a] = 1;
+    header[0x1c] = 24;
+    u32l(&header[0x22], obsize);
+    src = pixels;
+    for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
+        for (y = 0; y < 16; y++) {
+            uint16_t rowbits;
+            unsigned int x;
+            dst = ob + 3 * (16 * ncodepoint * (16 - 1 - y) + 16 * codepoint);
+            rowbits = *src++;
+            rowbits |= *src++ << 8;
+            for (x = 0; x < 16; x++) {
+                uint16_t intensity = (rowbits & 1) ? 255 : 0;
+                *dst++ = intensity;
+                *dst++ = intensity;
+                *dst++ = intensity;
+                rowbits >>= 1;
+            }
+        }
+    }
 }
 
 static void
@@ -120,7 +173,7 @@ out_tga(void)
 static void
 usage(void)
 {
-    fprintf(stderr, "usage: dumbfont2image farbfeld|tga\n");
+    fprintf(stderr, "usage: dumbfont2image bmp|farbfeld|tga\n");
     exit(1);
 }
 
@@ -135,7 +188,9 @@ main(int argc, char **argv)
     }
     format = argv[1];
     out = 0;
-    if (!strcmp(format, "farbfeld")) {
+    if (!strcmp(format, "bmp")) {
+        out = out_bmp;
+    } else if (!strcmp(format, "farbfeld")) {
         out = out_farbfeld;
     } else if (!strcmp(format, "tga")) {
         out = out_tga;

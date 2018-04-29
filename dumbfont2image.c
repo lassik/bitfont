@@ -62,6 +62,7 @@ copy_pixels(size_t bytes_per_pixel)
     unsigned char *dst;
     size_t codepoint, rowbits, yy, y, xx, x, byte, b;
 
+    obsize = bytes_per_pixel * width * height;
     if (!(ob = malloc(obsize))) {
         die("out of memory");
     }
@@ -100,25 +101,23 @@ u32l(unsigned char *out, unsigned long val)
 static void
 out_bmp(void)
 {
-    obsize = width * height * 3;
     headersize = 0x36;
     header[0] = 'B';
     header[1] = 'M';
-    u32l(&header[2], headersize + obsize);
+    u32l(&header[2], headersize + 3 * width * height);
     u32l(&header[0xa], headersize);
     u32l(&header[0xe], headersize - 0xe);
     u32l(&header[0x12], width);
     u32l(&header[0x16], 0xffffffff - height + 1);
     header[0x1a] = 1;
     header[0x1c] = 24;
-    u32l(&header[0x22], obsize);
+    u32l(&header[0x22], 3 * width * height);
     copy_pixels(3);
 }
 
 static void
 out_farbfeld(void)
 {
-    obsize = width * height * 8;
     headersize = 16;
     memcpy(header, "farbfeld", 8);
     header[10] = width >> 8;
@@ -131,7 +130,6 @@ out_farbfeld(void)
 static void
 out_tga(void)
 {
-    obsize = width * height * 3;
     headersize = 18;
     header[2] = 2;
     header[12] = width;

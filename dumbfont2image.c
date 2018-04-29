@@ -52,7 +52,7 @@ read_character_images(void)
 }
 
 static void
-copy_pixels(size_t bytes_per_pixel, size_t invert_rows)
+copy_pixels(size_t bytes_per_pixel)
 {
     unsigned char *src;
     unsigned char *dst;
@@ -67,9 +67,6 @@ copy_pixels(size_t bytes_per_pixel, size_t invert_rows)
         for (y = 0; y < 16; y++) {
             yy = 16 * (codepoint / codepoints_per_row) + y;
             xx = 16 * (codepoint % codepoints_per_row);
-            if (invert_rows) {
-                yy = height - 1 - yy;
-            }
             dst = ob + bytes_per_pixel * (16 * yy * codepoints_per_row + xx);
             rowbits = *src++;
             rowbits |= *src++ << 8;
@@ -107,11 +104,11 @@ out_bmp(void)
     u32l(&header[0xa], headersize);
     u32l(&header[0xe], headersize - 0xe);
     u32l(&header[0x12], width);
-    u32l(&header[0x16], height);
+    u32l(&header[0x16], 0xffffffff - height + 1);
     header[0x1a] = 1;
     header[0x1c] = 24;
     u32l(&header[0x22], obsize);
-    copy_pixels(3, 1);
+    copy_pixels(3);
 }
 
 static void
@@ -124,7 +121,7 @@ out_farbfeld(void)
     header[14] = height >> 8;
     header[15] = height;
     obsize = ncodepoint * 16 * 16 * 8;
-    copy_pixels(8, 0);
+    copy_pixels(8);
 }
 
 static void
@@ -139,7 +136,7 @@ out_tga(void)
     header[16] = 24;
     header[17] = 32;
     obsize = ncodepoint * 16 * 16 * 3;
-    copy_pixels(3, 0);
+    copy_pixels(3);
 }
 
 static void

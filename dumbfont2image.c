@@ -6,6 +6,7 @@
 #include "dumbfont.h"
 
 static size_t pixelscap;
+static size_t glyph_pixels = 16;
 static size_t codepoints_per_row = 8;
 static unsigned char *pixels;
 static size_t ncodepoint;
@@ -25,21 +26,22 @@ div_roundup(unsigned int x, unsigned int y)
 static void
 read_character_images(void)
 {
-    uint16_t rows[16];
+    size_t glyph_size = glyph_pixels * glyph_pixels / 8;
+    unsigned char glyph[glyph_size];
     size_t nr;
 
-    while ((nr = fread(rows, 1, 32, stdin)) == 32) {
+    while ((nr = fread(glyph, 1, glyph_size, stdin)) == glyph_size) {
         ncodepoint++;
         if (!pixelscap) {
             pixelscap = 1024;
         }
-        while (pixelscap && (pixelscap < ncodepoint * 32)) {
+        while (pixelscap && (pixelscap < ncodepoint * glyph_size)) {
             pixelscap *= 2;
         }
         if (!(pixels = realloc(pixels, pixelscap))) {
             die("out of memory");
         }
-        memcpy(pixels + 32 * (ncodepoint - 1), rows, 32);
+        memcpy(pixels + (ncodepoint - 1) * glyph_size, glyph, glyph_size);
     }
     if (ferror(stdin)) {
         die("cannot read from stdin");
@@ -47,8 +49,8 @@ read_character_images(void)
     if (nr) {
         die("junk data at the end of stdin");
     }
-    width = 16 * codepoints_per_row;
-    height = 16 * div_roundup(ncodepoint, codepoints_per_row);
+    width = glyph_pixels * codepoints_per_row;
+    height = glyph_pixels * div_roundup(ncodepoint, codepoints_per_row);
 }
 
 static void
@@ -64,13 +66,14 @@ copy_pixels(size_t bytes_per_pixel)
     }
     src = pixels;
     for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
-        for (y = 0; y < 16; y++) {
-            yy = 16 * (codepoint / codepoints_per_row) + y;
-            xx = 16 * (codepoint % codepoints_per_row);
-            dst = ob + bytes_per_pixel * (16 * yy * codepoints_per_row + xx);
+        for (y = 0; y < glyph_pixels; y++) {
+            yy = glyph_pixels * (codepoint / codepoints_per_row) + y;
+            xx = glyph_pixels * (codepoint % codepoints_per_row);
+            dst = ob + bytes_per_pixel *
+                           (glyph_pixels * yy * codepoints_per_row + xx);
             rowbits = *src++;
             rowbits |= *src++ << 8;
-            for (x = 0; x < 16; x++) {
+            for (x = 0; x < glyph_pixels; x++) {
                 byte = (rowbits & 1) ? 255 : 0;
                 for (b = 0; b < bytes_per_pixel; b++) {
                     *dst++ = byte;

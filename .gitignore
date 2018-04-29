@@ -1,4 +1,7 @@
 *.dSYM
+*.exe
+*.obj
+*.tds
 .DS_Store
 /calc
 /conversions/*.zip

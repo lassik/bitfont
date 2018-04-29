@@ -45,6 +45,36 @@ read_character_images(void)
 }
 
 static void
+copy_pixels(size_t bytes_per_pixel, size_t invert_rows)
+{
+    unsigned char *src;
+    unsigned char *dst;
+    size_t codepoint, ofs, y, x, b, byte;
+    uint16_t rowbits;
+
+    if (!(ob = malloc(obsize))) {
+        die("out of memory");
+    }
+    src = pixels;
+    for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
+        for (y = 0; y < 16; y++) {
+            ofs = invert_rows ? (16 - 1 - y) : y;
+            ofs = 16 * ncodepoint * ofs + 16 * codepoint;
+            dst = ob + bytes_per_pixel * ofs;
+            rowbits = *src++;
+            rowbits |= *src++ << 8;
+            for (x = 0; x < 16; x++) {
+                byte = (rowbits & 1) ? 255 : 0;
+                for (b = 0; b < bytes_per_pixel; b++) {
+                    *dst++ = byte;
+                }
+                rowbits >>= 1;
+            }
+        }
+    }
+}
+
+static void
 u32l(unsigned char *out, unsigned long val)
 {
     out[0] = val;
@@ -59,15 +89,8 @@ u32l(unsigned char *out, unsigned long val)
 static void
 out_bmp(void)
 {
-    unsigned char *src;
-    unsigned char *dst;
-    size_t codepoint, y;
-
     headersize = 0x36;
     obsize = ncodepoint * 16 * 16 * 3;
-    if (!(ob = malloc(obsize))) {
-        die("out of memory");
-    }
     header[0] = 'B';
     header[1] = 'M';
     u32l(&header[2], headersize + obsize);
@@ -78,33 +101,12 @@ out_bmp(void)
     header[0x1a] = 1;
     header[0x1c] = 24;
     u32l(&header[0x22], obsize);
-    src = pixels;
-    for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
-        for (y = 0; y < 16; y++) {
-            uint16_t rowbits;
-            unsigned int x;
-            dst = ob + 3 * (16 * ncodepoint * (16 - 1 - y) + 16 * codepoint);
-            rowbits = *src++;
-            rowbits |= *src++ << 8;
-            for (x = 0; x < 16; x++) {
-                uint16_t intensity = (rowbits & 1) ? 255 : 0;
-                *dst++ = intensity;
-                *dst++ = intensity;
-                *dst++ = intensity;
-                rowbits >>= 1;
-            }
-        }
-    }
+    copy_pixels(3, 1);
 }
 
 static void
 out_farbfeld(void)
 {
-    unsigned char *src;
-    uint16_t *dst;
-    size_t codepoint, y, x;
-    uint16_t rowbits, intensity;
-
     headersize = 16;
     memcpy(header, "farbfeld", 8);
     header[10] = width >> 8;
@@ -112,35 +114,12 @@ out_farbfeld(void)
     header[14] = height >> 8;
     header[15] = height;
     obsize = ncodepoint * 16 * 16 * 8;
-    if (!(ob = malloc(obsize))) {
-        die("out of memory");
-    }
-    src = pixels;
-    for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
-        for (y = 0; y < 16; y++) {
-            dst = (uint16_t *)(ob + 8 * (16 * ncodepoint * y + 16 * codepoint));
-            rowbits = *src++;
-            rowbits |= *src++ << 8;
-            for (x = 0; x < 16; x++) {
-                intensity = (rowbits & 1) ? 65535 : 0;
-                *dst++ = intensity;
-                *dst++ = intensity;
-                *dst++ = intensity;
-                *dst++ = 65535;
-                rowbits >>= 1;
-            }
-        }
-    }
+    copy_pixels(8, 0);
 }
 
 static void
 out_tga(void)
 {
-    unsigned char *src;
-    unsigned char *dst;
-    size_t codepoint, y, x;
-    uint16_t rowbits, intensity;
-
     headersize = 18;
     header[2] = 2;
     header[12] = width;
@@ -150,24 +129,7 @@ out_tga(void)
     header[16] = 24;
     header[17] = 32;
     obsize = ncodepoint * 16 * 16 * 3;
-    if (!(ob = malloc(obsize))) {
-        die("out of memory");
-    }
-    src = pixels;
-    for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
-        for (y = 0; y < 16; y++) {
-            dst = ob + 3 * (16 * ncodepoint * y + 16 * codepoint);
-            rowbits = *src++;
-            rowbits |= *src++ << 8;
-            for (x = 0; x < 16; x++) {
-                intensity = (rowbits & 1) ? 255 : 0;
-                *dst++ = intensity;
-                *dst++ = intensity;
-                *dst++ = intensity;
-                rowbits >>= 1;
-            }
-        }
-    }
+    copy_pixels(3, 0);
 }
 
 static void

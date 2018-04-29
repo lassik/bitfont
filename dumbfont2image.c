@@ -149,26 +149,31 @@ usage(void)
     exit(1);
 }
 
+static voidfun_t
+output_for_format(const char *format)
+{
+    if (!strcmp(format, "bmp")) {
+        return out_bmp;
+    }
+    if (!strcmp(format, "farbfeld")) {
+        return out_farbfeld;
+    }
+    if (!strcmp(format, "tga")) {
+        return out_tga;
+    }
+    usage();
+    return 0;
+}
+
 int
 main(int argc, char **argv)
 {
-    const char *format;
-    void (*out)(void);
+    voidfun_t out;
 
     if (argc != 2) {
         usage();
     }
-    format = argv[1];
-    out = 0;
-    if (!strcmp(format, "bmp")) {
-        out = out_bmp;
-    } else if (!strcmp(format, "farbfeld")) {
-        out = out_farbfeld;
-    } else if (!strcmp(format, "tga")) {
-        out = out_tga;
-    } else {
-        usage();
-    }
+    out = output_for_format(argv[1]);
     glyph_pixels = read_unisig();
     read_character_images();
     out();

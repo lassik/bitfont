@@ -25,10 +25,13 @@ div_roundup(unsigned int x, unsigned int y)
 static void
 read_character_images(void)
 {
-    size_t glyph_size = glyph_pixels * glyph_pixels / 8;
-    unsigned char glyph[glyph_size];
-    size_t nr;
+    unsigned char *glyph;
+    size_t glyph_size, nr;
 
+    glyph_size = glyph_pixels * glyph_pixels / 8;
+    if (!(glyph = malloc(glyph_size))) {
+        die("out of memory");
+    }
     while ((nr = fread(glyph, 1, glyph_size, stdin)) == glyph_size) {
         ncodepoint++;
         if (!pixelscap) {

@@ -6,7 +6,7 @@
 #include "dumbfont.h"
 
 static size_t pixelscap;
-static size_t glyph_pixels = 16;
+static size_t glyph_pixels;
 static size_t codepoints_per_row = 8;
 static unsigned char *pixels;
 static size_t ncodepoint;
@@ -169,9 +169,7 @@ main(int argc, char **argv)
     } else {
         usage();
     }
-    if (read_unisig() != 16) {
-        die("only dumbfont16 supported");
-    }
+    glyph_pixels = read_unisig();
     read_character_images();
     out();
     if ((1 != fwrite(header, headersize, 1, stdout)) ||

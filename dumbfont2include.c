@@ -124,6 +124,7 @@ main(int argc, char **argv)
 {
     voidfun_t out;
 
+    binary_stdin();
     if (argc == 3) {
         fontlabel = argv[2];
     } else if (argc == 4) {

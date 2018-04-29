@@ -9,3 +9,5 @@ typedef void (*voidfun_t)(void);
 
 void die(const char *msg);
 unsigned int read_unisig(void);
+void binary_stdin(void);
+void binary_stdout(void);

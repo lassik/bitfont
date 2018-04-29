@@ -170,6 +170,8 @@ main(int argc, char **argv)
 {
     voidfun_t out;
 
+    binary_stdin();
+    binary_stdout();
     if (argc != 2) {
         usage();
     }

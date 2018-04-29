@@ -1,3 +1,12 @@
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#endif
+
+#ifdef __BORLANDC__
+#define _setmode setmode
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,4 +54,20 @@ read_unisig(void)
     }
     die("bad unisig");
     return 0;
+}
+
+void
+binary_stdin(void)
+{
+#ifdef _WIN32
+    _setmode(_fileno(stdin), _O_BINARY);
+#endif
+}
+
+void
+binary_stdout(void)
+{
+#ifdef _WIN32
+    _setmode(_fileno(stdout), _O_BINARY);
+#endif
 }

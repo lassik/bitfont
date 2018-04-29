@@ -37,6 +37,7 @@ main(int argc, char **argv)
     unsigned int ibyte, ibit;
     int bestbaseline, leastmissing;
 
+    binary_stdout();
     if (argc != 3) {
         usage();
     }

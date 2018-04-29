@@ -100,34 +100,39 @@ usage(void)
     exit(1);
 }
 
+static voidfun_t
+output_for_syntax(const char *syntax)
+{
+    if (!strcmp(syntax, "as")) {
+        return out_as;
+    }
+    if (!strcmp(syntax, "c")) {
+        return out_c;
+    }
+    if (!strcmp(syntax, "go")) {
+        return out_go;
+    }
+    if (!strcmp(syntax, "nasm")) {
+        return out_nasm;
+    }
+    usage();
+    return 0;
+}
+
 int
 main(int argc, char **argv)
 {
-    const char *syntax;
-    void (*out)(void);
+    voidfun_t out;
 
     if (argc == 3) {
-        syntax = argv[1];
         fontlabel = argv[2];
     } else if (argc == 4) {
-        syntax = argv[1];
         fontlabel = argv[2];
         endlabel = argv[3];
     } else {
         usage();
     }
-    out = 0;
-    if (!strcmp(syntax, "as")) {
-        out = out_as;
-    } else if (!strcmp(syntax, "c")) {
-        out = out_c;
-    } else if (!strcmp(syntax, "go")) {
-        out = out_go;
-    } else if (!strcmp(syntax, "nasm")) {
-        out = out_nasm;
-    } else {
-        usage();
-    }
+    out = output_for_syntax(argv[1]);
     if (read_unisig() != 16) {
         die("only dumbfont16 supported");
     }

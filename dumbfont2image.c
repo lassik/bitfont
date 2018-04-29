@@ -6,6 +6,7 @@
 #include "dumbfont.h"
 
 static size_t pixelscap;
+static size_t codepoints_per_row = 8;
 static unsigned char *pixels;
 static size_t ncodepoint;
 static size_t headersize;
@@ -14,6 +15,12 @@ static size_t obsize;
 static unsigned char *ob;
 static size_t width;
 static size_t height;
+
+static unsigned int
+div_roundup(unsigned int x, unsigned int y)
+{
+    return (x + y - 1) / y;
+}
 
 static void
 read_character_images(void)
@@ -40,8 +47,8 @@ read_character_images(void)
     if (nr) {
         die("junk data at the end of stdin");
     }
-    width = 16 * ncodepoint;
-    height = 16;
+    width = 16 * codepoints_per_row;
+    height = 16 * div_roundup(ncodepoint, codepoints_per_row);
 }
 
 static void
@@ -49,7 +56,7 @@ copy_pixels(size_t bytes_per_pixel, size_t invert_rows)
 {
     unsigned char *src;
     unsigned char *dst;
-    size_t codepoint, ofs, y, x, b, byte;
+    size_t codepoint, yy, y, xx, x, b, byte;
     uint16_t rowbits;
 
     if (!(ob = malloc(obsize))) {
@@ -58,9 +65,10 @@ copy_pixels(size_t bytes_per_pixel, size_t invert_rows)
     src = pixels;
     for (codepoint = 0; codepoint < ncodepoint; codepoint++) {
         for (y = 0; y < 16; y++) {
-            ofs = invert_rows ? (16 - 1 - y) : y;
-            ofs = 16 * ncodepoint * ofs + 16 * codepoint;
-            dst = ob + bytes_per_pixel * ofs;
+            yy = 16 * (codepoint / codepoints_per_row);
+            yy += invert_rows ? (16 - 1 - y) : y;
+            xx = 16 * (codepoint % codepoints_per_row);
+            dst = ob + bytes_per_pixel * (16 * yy * codepoints_per_row + xx);
             rowbits = *src++;
             rowbits |= *src++ << 8;
             for (x = 0; x < 16; x++) {

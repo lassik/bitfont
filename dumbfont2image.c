@@ -107,7 +107,7 @@ out_tga(void)
             rowbits = *src++;
             rowbits |= *src++ << 8;
             for (x = 0; x < 16; x++) {
-                intensity = (rowbits & 1) ? 65535 : 0;
+                intensity = (rowbits & 1) ? 255 : 0;
                 *dst++ = intensity;
                 *dst++ = intensity;
                 *dst++ = intensity;

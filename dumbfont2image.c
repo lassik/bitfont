@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,8 +57,7 @@ copy_pixels(size_t bytes_per_pixel)
 {
     unsigned char *src;
     unsigned char *dst;
-    size_t codepoint, yy, y, xx, x, b, byte;
-    uint16_t rowbits;
+    size_t codepoint, rowbits, yy, y, xx, x, byte, b;
 
     if (!(ob = malloc(obsize))) {
         die("out of memory");

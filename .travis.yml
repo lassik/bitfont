@@ -1,0 +1,10 @@
+language: c
+compiler:
+  - clang
+  - gcc
+os:
+  - linux
+  - osx
+  - windows
+script:
+  - ./build.sh
